@@ -184,7 +184,7 @@ async def back(event):
 async def show_help(event):
     help_text = (
         "🛠 **Perintah yang Tersedia:**\n"
-        "/promote - Promosikan pesan ke semua grup.\n"
+        "/p - Promosikan pesan ke semua grup.\n"
         "/blacklist - Daftar hitamkan grup saat ini agar tidak menerima promosi.\n"
         "/addqr - Tambahkan kode QR (kirim gambar sebagai balasan atas perintah ini).\n"
         "/getqr - Ambil semua kode QR yang disimpan.\n"
