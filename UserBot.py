@@ -58,7 +58,7 @@ async def main():
 def is_device_owner(sender_id):
     return sender_id == device_owner_id
 
-@client.on(events.NewMessage(pattern='/promote', outgoing=True))
+@client.on(events.NewMessage(pattern='/p', outgoing=True))
 async def promote(event):
     sender = await event.get_sender()
     if not is_device_owner(sender.id):
@@ -79,7 +79,7 @@ async def promote(event):
     groups = [dialog for dialog in await client.get_dialogs() if dialog.is_group]
     total_groups = len(groups)
 
-    loading_symbols = ["-", "\\", "|", "/"]
+    loading_symbols = [".", "..", "...", "...."]
 
     for dialog in groups:
         if dialog.id in blacklisted_groups:
@@ -96,7 +96,7 @@ async def promote(event):
             
             for remaining_time in range(delay, 0, -1):
                 loading_animation = "".join([symbol for symbol in loading_symbols[:sent_count % len(loading_symbols) + 1]])
-                await status_message.edit(append_watermark_to_message(f"🔎 Mengirim jaseb ke grup... {progress:.2f}%\n\n✔️ {loading_animation} Terkirim: {sent_count}\n❌ Gagal: {failed_count}\n⏭ Grup selanjutnya {remaining_time} detik lagi..."))
+                await status_message.edit(append_watermark_to_message(f"🔎 Mengirim jaseb ke grup{loading_animation} {progress:.2f}%\n\n✔️ Terkirim: {sent_count}\n❌ Gagal: {failed_count}\n⏭ Grup selanjutnya {remaining_time} detik lagi..."))
                 await asyncio.sleep(1)
         except Exception as e:
             failed_count += 1
