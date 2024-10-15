@@ -19,13 +19,6 @@ os.makedirs(QR_CODE_DIR, exist_ok=True)
 # Blacklisted group list
 blacklisted_groups = []
 
-# Watermark text
-WATERMARK_TEXT = ""
-
-# Function to append watermark to a message
-def append_watermark_to_message(message):
-return f"{message}\n\n{WATERMARK_TEXT}"
-
 async def main():
 await client.start()
 print("Client Created")
