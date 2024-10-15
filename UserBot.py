@@ -4,6 +4,7 @@ import asyncio
 from datetime import datetime
 from telethon.errors import FloodWaitError
 from telethon.tl import functions
+import time
 
 DEL_TIME_OUT = 60
 DEFAULTUSER = "Own"
