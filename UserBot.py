@@ -87,10 +87,10 @@ async def promote(event):
         try:
             if reply_message.media:
                 media_path = await client.download_media(reply_message.media)
-                await client.send_file(dialog.id, media_path, caption=append_watermark_to_message(reply_message.message))
+                await client.send_file(dialog.id, media_path, caption=append_watermark_to_message(reply_message.message, disable_web_page_preview: true, parse_mode: html))
             else:
                 message_with_watermark = append_watermark_to_message(reply_message.message)
-                await client.send_message(dialog.id, message_with_watermark)
+                await client.send_message(dialog.id, message_with_watermark, disable_web_page_preview: true, parse_mode: html)
             sent_count += 1
             progress = (sent_count / total_groups) * 100
             
