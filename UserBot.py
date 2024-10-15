@@ -6,7 +6,7 @@ from telethon.errors import FloodWaitError
 from telethon.tl import functions
 
 DEL_TIME_OUT = 60
-DEFAULTUSER = str(ALIVE_NAME) if ALIVE_NAME else "Own"
+DEFAULTUSER = "Own"
 
 api_id = '29798494'
 api_hash = '53273c1de3e68a9ecdb90de2dcf46f6c'
