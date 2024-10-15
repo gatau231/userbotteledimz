@@ -85,12 +85,27 @@ async def promote(event):
         if dialog.id in blacklisted_groups:
             continue
         try:
-            if reply_message.media:
-                media_path = await client.download_media(reply_message.media)
-                await client.send_file(dialog.id, media_path, caption=append_watermark_to_message(reply_message.message, parse_mode='HTML'))
-            else:
-                message_with_watermark = append_watermark_to_message(reply_message.message)
-                await client.send_message(dialog.id, message_with_watermark, parse_mode='HTML')
+            if reply_message:
+    if reply_message.is_channel:
+        # Pesan berasal dari channel
+        channel_message = await client.get_messages(reply_message.chat_id, ids=reply_message.id)
+        
+        if channel_message:
+            # Teruskan pesan dari channel
+            await client.forward_messages(dialog.id, channel_message)
+            
+            # Tambahkan watermark jika diperlukan
+            if channel_message.text:
+                message_with_watermark = append_watermark_to_message(channel_message.text)
+                await client.send_message(dialog.id, message_with_watermark, parse_mode='HTML', disable_web_page_preview: true)
+    else:
+        # Pesan bukan dari channel, gunakan logika yang sudah ada
+        if reply_message.media:
+            media_path = await client.download_media(reply_message.media)
+            await client.send_file(dialog.id, media_path, caption=append_watermark_to_message(reply_message.message, parse_mode='HTML', disable_web_page_preview: true))
+        else:
+            message_with_watermark = append_watermark_to_message(reply_message.message)
+            await client.send_message(dialog.id, message_with_watermark, parse_mode='HTML', disable_web_page_preview: true)
             sent_count += 1
             progress = (sent_count / total_groups) * 100
             
