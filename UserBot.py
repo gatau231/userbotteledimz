@@ -170,7 +170,7 @@ async def afk(event):
 @client.on(events.NewMessage(incoming=True))
 async def handle_incoming(event):
     global afk_reason
-    if afk_reason and event.mentioned:
+    if afk_reason and (event.mentioned or event.is_private):
         await event.reply(append_watermark_to_message(f"{afk_reason}"))
 
 @client.on(events.NewMessage(pattern='/back', outgoing=True))
