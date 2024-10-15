@@ -24,7 +24,6 @@ WATERMARK_TEXT = "Source : @OKOKOKMIN"
 
 # Function to append watermark to a message
 def append_watermark_to_message(message):
-return f"{message}\n\n{WATERMARK_TEXT}"
 
 async def main():
 await client.start()
