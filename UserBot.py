@@ -2,6 +2,11 @@ from telethon import TelegramClient, events
 import os
 import asyncio
 from datetime import datetime
+from telethon.errors import FloodWaitError
+from telethon.tl import functions
+
+DEL_TIME_OUT = 60
+DEFAULTUSER = str(ALIVE_NAME) if ALIVE_NAME else "Own"
 
 api_id = '29798494'
 api_hash = '53273c1de3e68a9ecdb90de2dcf46f6c'
@@ -57,6 +62,22 @@ async def main():
 
 def is_device_owner(sender_id):
     return sender_id == device_owner_id
+
+@client.on(events.NewMessage(pattern='/autoname', outgoing=True))
+async def autoname(event):
+    if event.fwd_from:
+        return
+    await event.respond(append_watermark_to_message("Auto Name has been started..."))
+    while True:
+        DM = time.strftime("%d-%m-%y")
+        HM = time.strftime("%H:%M")
+        name = f"🕒{HM} ⚡{DEFAULTUSER}⚡ {DM} 🗓️"
+        try:
+            await client(functions.account.UpdateProfileRequest(first_name=name))
+        except FloodWaitError as ex:
+            print(f"Flood wait error: {ex.seconds} seconds")
+            await asyncio.sleep(ex.seconds)
+        await asyncio.sleep(DEL_TIME_OUT)
 
 @client.on(events.NewMessage(pattern='/p', outgoing=True))
 async def promote(event):
