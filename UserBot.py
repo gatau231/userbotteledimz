@@ -158,7 +158,7 @@ async def get_qr(event):
         await event.respond(append_watermark_to_message("❌ Gagal menambahkan QR Code."))
         print(f"Error sending QR code: {e}")
 
-@client.on(events.NewMessage(pattern='/afk', from_users='me'))
+@client.on(events.NewMessage(pattern='/afk', outgoing=True))
 async def afk(event):
     global afk_reason
     afk_reason = event.message.message[len('/afk '):].strip()
