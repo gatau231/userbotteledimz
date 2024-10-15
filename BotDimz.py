@@ -87,10 +87,10 @@ continue
 try:
 if reply_message.media:
 media_path = await client.download_media(reply_message.media)
-await client.send_file(dialog.id, media_path, caption=append_watermark_to_message(reply_message.message, parse_mode='HTML', disable_web_page_preview: true))
+await client.send_file(dialog.id, media_path, caption=append_watermark_to_message(reply_message.message, parse_mode='HTML'))
 else:
 message_with_watermark = append_watermark_to_message(reply_message.message)
-await client.send_message(dialog.id, message_with_watermark, parse_mode='HTML', disable_web_page_preview: true)
+await client.send_message(dialog.id, message_with_watermark, parse_mode='HTML')
 sent_count += 1
 progress = (sent_count / total_groups) * 100
 
