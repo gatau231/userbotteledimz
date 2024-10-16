@@ -221,11 +221,6 @@ async def handle_incoming(event):
     tgln = datetime.now().date()
     anu = f'{sender.id}-{tgln}'
     if afk_reason and event.is_private:
-        user_id = sender.id
-        
-        # Cek apakah pengguna sudah menerima pesan AFK
-        if user_id not in handled_users:
-            handled_users.add(user_id)  # Tambahkan pengguna ke set
             await event.reply(append_watermark_to_message(f"{afk_reason}"))
 
 @client.on(events.NewMessage(pattern='/back', outgoing=True))
