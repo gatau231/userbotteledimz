@@ -221,15 +221,18 @@ async def handle_incoming(event):
     tgln = datetime.now().date()
     anu = f'{sender.id}-{tgln}'
     if afk_reason and event.is_private:
-        # Hanya kirim pesan jika pengguna belum menerima pesan AFK
-        if anu not in handled_users:
-            handled_users.add(anu)  # Tambahkan pengguna ke set
+        user_id = sender.id
+        
+        # Cek apakah pengguna sudah menerima pesan AFK
+        if user_id not in handled_users:
+            handled_users.add(user_id)  # Tambahkan pengguna ke set
             await event.reply(append_watermark_to_message(f"{afk_reason}"))
 
 @client.on(events.NewMessage(pattern='/back', outgoing=True))
 async def back(event):
     global afk_reason
     afk_reason = None
+    handled_users.clear()
     await event.respond(append_watermark_to_message("👋 Halo Aku On Kembali"))
     print("AFK mode disabled.")
 
