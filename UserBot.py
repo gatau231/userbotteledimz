@@ -224,7 +224,7 @@ async def handle_incoming(event):
         # Hanya kirim pesan jika pengguna belum menerima pesan AFK
         if anu not in handled_users:
             handled_users.add(anu)  # Tambahkan pengguna ke set
-            await event.reply(append_watermark_to_message(f"{afk_reason}")
+            await event.reply(append_watermark_to_message(f"{afk_reason}"))
 
 @client.on(events.NewMessage(pattern='/back', outgoing=True))
 async def back(event):
