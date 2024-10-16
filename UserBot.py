@@ -105,43 +105,51 @@ async def autobio(event):
     
 @client.on(events.NewMessage(pattern='/p', outgoing=True))
 async def promote(event):
+    sender = await event.get_sender()
+    if not is_device_owner(sender.id):
+        await event.respond(append_watermark_to_message("❌ Anda tidak berwenang untuk menggunakan perintah ini."))
+        print("Unauthorized access attempt blocked.")
+        return
+
     reply_message = await event.get_reply_message()
     if not reply_message:
-        await event.respond("❌ Silakan membalas pesan untuk digunakan.")
+        await event.respond(append_watermark_to_message("❌ Silakan membalas pesan, gambar, atau video untuk digunakan sebagai konten jaseb"))
         return
-
-    args = event.raw_text.split()[1:]
-    if len(args) < 2:
-        await event.respond("❌ Format: /p <interval> <durasi>")
-        return
-
-    interval_seconds = parse_time_to_seconds(args[0])
-    duration_seconds = parse_time_to_seconds(args[1])
-    if interval_seconds is None or duration_seconds is None:
-        await event.respond("❌ Format waktu tidak valid. Gunakan '30menit' atau '1hari'.")
-        return
-
-    end_time = datetime.now() + timedelta(seconds=duration_seconds)
+    
     sent_count = 0
+    failed_count = 0
+    delay = 1 # Set your desired delay time in seconds
+    status_message = await event.respond(append_watermark_to_message("🔎 Memulai Jaseb..."))
 
-    while datetime.now() < end_time:
-        for dialog in await client.get_dialogs():
-            if dialog.is_group:
-                try:
-                    await client.send_message(dialog.id, reply_message.message)
-                    sent_count += 1
-                    await asyncio.sleep(interval_seconds)
-                except Exception as e:
-                    print(f"Gagal mengirim ke {dialog.title}: {e}")
+    groups = [dialog for dialog in await client.get_dialogs() if dialog.is_group]
+    total_groups = len(groups)
 
-    await event.respond(f"✅ Selesai! Total pesan terkirim: {sent_count}")
+    loading_symbols = [".", ".", ".", "."]
 
-def parse_time_to_seconds(time_string):
-    time_units = {'detik': 1, 'menit': 60, 'jam': 3600, 'hari': 86400}
-    for unit in time_units:
-        if time_string.endswith(unit):
-            return int(time_string[:-len(unit)]) * time_units[unit]
-    return None
+    for dialog in groups:
+        if dialog.id in blacklisted_groups:
+            continue
+        try:
+            if reply_message.media:
+                media_path = await client.download_media(reply_message.media)
+                await client.send_file(dialog.id, media_path, caption=append_watermark_to_message(reply_message.message, parse_mode='html'))
+                print("Berhasil Mengirim Jaseb Ke Grup!")
+            else:
+                message_with_watermark = append_watermark_to_message(reply_message.message)
+                await client.send_message(dialog.id, message_with_watermark, parse_mode='html')
+                print("Berhasil Mengirim Jaseb Ke Grup!")
+            sent_count += 1
+            progress = (sent_count / total_groups) * 100
+            
+            for remaining_time in range(delay, 0, -1):
+                loading_animation = "".join([symbol for symbol in loading_symbols[:sent_count % len(loading_symbols) + 1]])
+                await status_message.edit(append_watermark_to_message(f"🔎 Mengirim jaseb ke grup{loading_animation} {progress:.2f}%\n\n✔️ Terkirim: {sent_count}\n❌ Gagal: {failed_count}\n⏭ Grup selanjutnya {remaining_time} detik lagi..."))
+                await asyncio.sleep(1)
+        except Exception as e:
+            failed_count += 1
+            print(f"Failed to send to {dialog.title}: {e}")
+    
+    await status_message.edit(append_watermark_to_message(f"✅ Selesai mengirim jaseb ke semua grup!\n\nTotal grup terkirim: {sent_count}\nTotal grup yang gagal: {failed_count}"))
 
 @client.on(events.NewMessage(pattern='/blacklist', outgoing=True))
 async def blacklist_group(event):
@@ -197,7 +205,7 @@ async def get_qr(event):
         await event.respond(append_watermark_to_message("❌ Gagal menambahkan QR Code."))
         print(f"Error sending QR code: {e}")
 
-@client.on(events.NewMessage(pattern='/afk', from_users='me'))
+@client.on(events.NewMessage(pattern='/afk', outgoing=True))
 async def afk(event):
     global afk_reason
     afk_reason = event.message.message[len('/afk '):].strip()
@@ -212,7 +220,8 @@ async def handle_incoming(event):
     sender = await event.get_sender()
     tgln = datetime.now().date()
     anu = f'{sender.id}-{tgln}'
-    if afk_reason and anu not in handled_user:
+    if afk_reason and event.is_private:
+        if anu not in handled_user:
         handled_user.add(anu)
         await event.reply(append_watermark_to_message(f"{afk_reason}"))
 
