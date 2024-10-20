@@ -205,6 +205,7 @@ async def get_qr(event):
         await event.respond(append_watermark_to_message("❌ Gagal menambahkan QR Code."))
         print(f"Error sending QR code: {e}")
 
+handled_user = set()
 @client.on(events.NewMessage(pattern='/afk', outgoing=True))
 async def afk(event):
     global afk_reason
@@ -217,11 +218,14 @@ async def afk(event):
 @client.on(events.NewMessage(incoming=True))
 async def handle_incoming(event):
     global afk_reason
+    if not event.is_private:
+      return
     sender = await event.get_sender()
     tgln = datetime.now().date()
     anu = f'{sender.id}-{tgln}'
-    if afk_reason and event.is_private:
-            await event.reply(append_watermark_to_message(f"{afk_reason}"))
+    if afk_reason and anu not in handled_user:
+        handled_user.add(anu)
+        await event.reply(append_watermark_to_message(f"{afk_reason}"))
 
 @client.on(events.NewMessage(pattern='/back', outgoing=True))
 async def back(event):
