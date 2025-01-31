@@ -103,7 +103,7 @@ async def autobio(event):
         
         await asyncio.sleep(DEL_TIME_OUT)
     
-@client.on(events.NewMessage(pattern='/p', outgoing=True))
+@client.on(events.NewMessage(pattern='/gcast', outgoing=True))
 async def promote(event):
     sender = await event.get_sender()
     if not is_device_owner(sender.id):
